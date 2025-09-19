@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #667eea;
+            background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            color: white;
+        }
+
+        .loader {
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <h2>Taking you to the right destination...</h2>
+    </div>
+
+    <script>
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function setCustomGradient() {
+            const baseColor = getUrlParameter('bg') || getUrlParameter('color');
+
+            if (baseColor) {
+                const color = `#${baseColor.replace('#', '')}`;
+                document.body.style.backgroundColor = color;
+            }
+        }
+
+        function detectDeviceAndRedirect() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+            // Get URL parameters
+            const iosUrl = getUrlParameter('ios');
+            const androidUrl = getUrlParameter('android');
+            const defaultUrl = getUrlParameter('default') || getUrlParameter('web');
+
+            // Device detection
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                // iOS device
+                if (iosUrl) {
+                    window.location.href = iosUrl;
+                    return;
+                }
+            }
+
+            if (/android/i.test(userAgent)) {
+                // Android device
+                if (androidUrl) {
+                    window.location.href = androidUrl;
+                    return;
+                }
+            }
+
+            // Default redirect (desktop, unknown devices, or missing URLs)
+            if (defaultUrl) {
+                window.location.href = defaultUrl;
+            } else {
+                document.querySelector('.loader').innerHTML = `
+                    <h2>Error: No redirect URL specified</h2>
+                `;
+            }
+        }
+
+        // Set custom gradient first
+        setCustomGradient();
+
+        // Start redirect after a short delay for better UX
+        setTimeout(detectDeviceAndRedirect, 1000);
+    </script>
+</body>
+
+</html>
